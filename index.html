@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Pocket Chord Pad (1, 3, 4, 5, 6, 7)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #090b10;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .pad-btn {
+      touch-action: manipulation;
+      transition: transform 0.04s ease-out, background-color 0.08s ease, box-shadow 0.08s ease;
+      position: relative;
+    }
+    .pad-btn:active, .pad-btn.active-touch {
+      transform: scale(0.94);
+      filter: brightness(1.35);
+      box-shadow: inset 0 0 16px rgba(255,255,255,0.4);
+    }
+    .grid-container {
+      height: calc(100dvh - 46px);
+    }
+  </style>
+</head>
+<body class="flex flex-col text-slate-100 antialiased select-none">
+
+  <!-- TOP HEADER / STATUS -->
+  <header class="h-[46px] bg-slate-950/95 border-b border-slate-800/80 px-2 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center gap-2">
+      <div class="flex items-center bg-slate-900 border border-slate-700/80 rounded px-2 py-0.5 shadow-inner">
+        <span class="text-[9px] text-amber-400 font-bold tracking-wider uppercase mr-1">KEY</span>
+        <select id="keySelect" class="bg-transparent text-amber-300 font-black text-xs outline-none cursor-pointer">
+          <option value="G" selected>G Maj</option>
+          <option value="C">C Maj</option>
+          <option value="D">D Maj</option>
+          <option value="A">A Maj</option>
+          <option value="E">E Maj</option>
+          <option value="F">F Maj</option>
+          <option value="Bb">B♭ Maj</option>
+          <option value="Eb">E♭ Maj</option>
+          <option value="Ab">A♭ Maj</option>
+          <option value="Db">D♭ Maj</option>
+          <option value="F#">F♯ Maj</option>
+          <option value="B">B Maj</option>
+          <option value="CUSTOM">Custom...</option>
+        </select>
+      </div>
+
+      <div class="flex items-center bg-slate-900 border border-slate-700/80 rounded px-2 py-0.5">
+        <select id="instSelect" class="bg-transparent text-sky-300 font-bold text-xs outline-none cursor-pointer">
+          <option value="electricClean">Clean Guitar</option>
+          <option value="electricDist">Dist Guitar</option>
+          <option value="cousinPiano" selected>Cousin Piano</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Live Readout / Mode -->
+    <div class="flex items-center gap-2">
+      <div id="readout" class="text-right">
+        <div id="readoutChord" class="text-xs font-black text-emerald-400 tracking-tight leading-tight">READY</div>
+        <div id="readoutNotes" class="text-[9px] text-slate-400 font-mono tracking-tighter leading-tight">Tap any pad</div>
+      </div>
+      <button id="strumToggle" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-[10px] font-bold text-slate-300">
+        STRUM
+      </button>
+    </div>
+  </header>
+
+  <!-- 6-COLUMN PADS CONTAINER -->
+  <main class="grid-container flex-1 p-1 bg-slate-950 flex flex-col gap-1 overflow-hidden">
+    <!-- Degree & Root headers -->
+    <div class="grid grid-cols-6 gap-1 h-6 shrink-0">
+      <button onclick="openColPicker(0)" class="col-head flex flex-col items-center justify-center bg-slate-900/90 rounded border border-slate-800 text-[10px] font-black text-amber-300 active:bg-slate-800">
+        <span class="text-[7px] text-slate-400 leading-none">1 (ROOT)</span>
+        <span id="degLabel0" class="leading-none mt-0.5">G ▼</span>
+      </button>
+      <button onclick="openColPicker(1)" class="col-head flex flex-col items-center justify-center bg-slate-900/90 rounded border border-slate-800 text-[10px] font-black text-amber-300 active:bg-slate-800">
+        <span class="text-[7px] text-slate-400 leading-none">3</span>
+        <span id="degLabel1" class="leading-none mt-0.5">B ▼</span>
+      </button>
+      <button onclick="openColPicker(2)" class="col-head flex flex-col items-center justify-center bg-slate-900/90 rounded border border-slate-800 text-[10px] font-black text-amber-300 active:bg-slate-800">
+        <span class="text-[7px] text-slate-400 leading-none">4</span>
+        <span id="degLabel2" class="leading-none mt-0.5">C ▼</span>
+      </button>
+      <button onclick="openColPicker(3)" class="col-head flex flex-col items-center justify-center bg-slate-900/90 rounded border border-slate-800 text-[10px] font-black text-amber-300 active:bg-slate-800">
+        <span class="text-[7px] text-slate-400 leading-none">5</span>
+        <span id="degLabel3" class="leading-none mt-0.5">D ▼</span>
+      </button>
+      <button onclick="openColPicker(4)" class="col-head flex flex-col items-center justify-center bg-slate-900/90 rounded border border-slate-800 text-[10px] font-black text-amber-300 active:bg-slate-800">
+        <span class="text-[7px] text-slate-400 leading-none">6</span>
+        <span id="degLabel4" class="leading-none mt-0.5">E ▼</span>
+      </button>
+      <button onclick="openColPicker(5)" class="col-head flex flex-col items-center justify-center bg-slate-900/90 rounded border border-slate-800 text-[10px] font-black text-amber-300 active:bg-slate-800">
+        <span class="text-[7px] text-slate-400 leading-none">7</span>
+        <span id="degLabel5" class="leading-none mt-0.5">F# ▼</span>
+      </button>
+    </div>
+
+    <!-- 2 ROWS: MAJOR (Row 1), MINOR (Row 2) -->
+    <div class="grid grid-cols-6 grid-rows-2 gap-1.5 flex-1 min-h-0">
+      <!-- ROW 1: MAJOR CHORDS -->
+      <button data-col="0" data-quality="maj" class="pad-btn rounded-lg bg-gradient-to-b from-blue-600 to-indigo-800 border border-blue-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">G</span>
+        <span class="text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">MAJ</span>
+      </button>
+      <button data-col="1" data-quality="maj" class="pad-btn rounded-lg bg-gradient-to-b from-blue-600 to-indigo-800 border border-blue-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">B</span>
+        <span class="text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">MAJ</span>
+      </button>
+      <button data-col="2" data-quality="maj" class="pad-btn rounded-lg bg-gradient-to-b from-blue-600 to-indigo-800 border border-blue-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">C</span>
+        <span class="text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">MAJ</span>
+      </button>
+      <button data-col="3" data-quality="maj" class="pad-btn rounded-lg bg-gradient-to-b from-blue-600 to-indigo-800 border border-blue-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">D</span>
+        <span class="text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">MAJ</span>
+      </button>
+      <button data-col="4" data-quality="maj" class="pad-btn rounded-lg bg-gradient-to-b from-blue-600 to-indigo-800 border border-blue-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">E</span>
+        <span class="text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">MAJ</span>
+      </button>
+      <button data-col="5" data-quality="maj" class="pad-btn rounded-lg bg-gradient-to-b from-blue-600 to-indigo-800 border border-blue-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">F#</span>
+        <span class="text-[9px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">MAJ</span>
+      </button>
+
+      <!-- ROW 2: MINOR CHORDS -->
+      <button data-col="0" data-quality="min" class="pad-btn rounded-lg bg-gradient-to-b from-emerald-600 to-teal-850 border border-emerald-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">Gm</span>
+        <span class="text-[9px] font-bold text-emerald-200 uppercase tracking-widest mt-0.5">MIN</span>
+      </button>
+      <button data-col="1" data-quality="min" class="pad-btn rounded-lg bg-gradient-to-b from-emerald-600 to-teal-850 border border-emerald-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">Bm</span>
+        <span class="text-[9px] font-bold text-emerald-200 uppercase tracking-widest mt-0.5">MIN</span>
+      </button>
+      <button data-col="2" data-quality="min" class="pad-btn rounded-lg bg-gradient-to-b from-emerald-600 to-teal-850 border border-emerald-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">Cm</span>
+        <span class="text-[9px] font-bold text-emerald-200 uppercase tracking-widest mt-0.5">MIN</span>
+      </button>
+      <button data-col="3" data-quality="min" class="pad-btn rounded-lg bg-gradient-to-b from-emerald-600 to-teal-850 border border-emerald-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">Dm</span>
+        <span class="text-[9px] font-bold text-emerald-200 uppercase tracking-widest mt-0.5">MIN</span>
+      </button>
+      <button data-col="4" data-quality="min" class="pad-btn rounded-lg bg-gradient-to-b from-emerald-600 to-teal-850 border border-emerald-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">Em</span>
+        <span class="text-[9px] font-bold text-emerald-200 uppercase tracking-widest mt-0.5">MIN</span>
+      </button>
+      <button data-col="5" data-quality="min" class="pad-btn rounded-lg bg-gradient-to-b from-emerald-600 to-teal-850 border border-emerald-400/40 shadow flex flex-col items-center justify-center p-0.5">
+        <span class="chord-title font-black text-lg md:text-xl text-white tracking-tight drop-shadow leading-none">F#m</span>
+        <span class="text-[9px] font-bold text-emerald-200 uppercase tracking-widest mt-0.5">MIN</span>
+      </button>
+    </div>
+  </main>
+
+  <!-- QUICK PICKER MODAL FOR ANY COLUMN -->
+  <div id="pickerModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl p-4 w-full max-w-xs shadow-2xl text-center">
+      <div id="pickerTitle" class="text-xs font-bold text-amber-400 uppercase tracking-widest mb-3">Choose Root Note</div>
+      <div class="grid grid-cols-4 gap-2 mb-4" id="pickerGrid">
+        <!-- 12 Chromatic note buttons generated dynamically -->
+      </div>
+      <button onclick="closeColPicker()" class="w-full py-2 bg-slate-800 text-slate-300 font-bold text-xs rounded hover:bg-slate-700">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    // Musical definitions
+    const NOTE_NAMES = ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"];
+    
+    // Scale degrees: 1 (Root, 0st), 3 (Maj 3rd, 4st), 4 (Perf 4th, 5st), 5 (Perf 5th, 7st), 6 (Maj 6th, 9st), 7 (Maj 7th, 11st)
+    const DEGREE_OFFSETS = [0, 4, 5, 7, 9, 11];
+
+    const KEY_ROOTS = {
+      "G": 7, "C": 0, "D": 2, "A": 9, "E": 4, "F": 5,
+      "Bb": 10, "Eb": 3, "Ab": 8, "Db": 1, "F#": 6, "B": 11
+    };
+
+    // Current State (Default: Key of G -> G, B, C, D, E, F#)
+    let currentColumns = [7, 11, 0, 2, 4, 6];
+    let isStrumming = true;
+    let selectedColIndex = null;
+
+    // Web Audio Synthesizer Engine
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let ctx = null;
+
+    function ensureAudioContext() {
+      if (!ctx) {
+        ctx = new AudioCtx();
+      }
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+    }
+
+    function midiToFreq(midi) {
+      return 440 * Math.pow(2, (midi - 69) / 12);
+    }
+
+    // Sigmoid distortion curve
+    function makeDistortionCurve(amount = 35) {
+      const n_samples = 44100;
+      const curve = new Float32Array(n_samples);
+      const deg = Math.PI / 180;
+      for (let i = 0; i < n_samples; ++i) {
+        let x = (i * 2) / n_samples - 1;
+        curve[i] = ((3 + amount) * x * 20 * deg) / (Math.PI + amount * Math.abs(x));
+      }
+      return curve;
+    }
+    const distCurve = makeDistortionCurve(40);
+
+    function playNote(freq, instrument, startTime, duration = 1.6) {
+      const now = startTime;
+
+      if (instrument === 'electricClean') {
+        // Bright plucked attack with warm body
+        const osc = ctx.createOscillator();
+        const sub = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+        sub.type = 'sine';
+        sub.frequency.setValueAtTime(freq * 0.5, now);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(3200, now);
+        filter.frequency.exponentialRampToValueAtTime(700, now + duration);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.25, now + 0.008);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(filter);
+        sub.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        sub.start(now);
+        osc.stop(now + duration);
+        sub.stop(now + duration);
+
+      } else if (instrument === 'electricDist') {
+        // Overdriven / saturated guitar tone
+        const osc = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const waveShaper = ctx.createWaveShaper();
+        const gain = ctx.createGain();
+        const cabFilter = ctx.createBiquadFilter();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now);
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(freq * 1.002, now); // slight detune
+
+        waveShaper.curve = distCurve;
+        waveShaper.oversample = '4x';
+
+        // Speaker cabinet bandpass filtering
+        cabFilter.type = 'lowpass';
+        cabFilter.frequency.setValueAtTime(2600, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.18, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration * 1.1);
+
+        osc.connect(waveShaper);
+        osc2.connect(waveShaper);
+        waveShaper.connect(cabFilter);
+        cabFilter.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc2.start(now);
+        osc.stop(now + duration * 1.1);
+        osc2.stop(now + duration * 1.1);
+
+      } else {
+        // Cousin Piano: hammer strike with dual detuned harmonic layers
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(freq, now);
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 2, now); // 2nd harmonic sparkle
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(4500, now);
+        filter.frequency.exponentialRampToValueAtTime(800, now + duration);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.3, now + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + duration);
+        osc2.stop(now + duration);
+      }
+    }
+
+    function playChord(rootIndex, isMinor) {
+      ensureAudioContext();
+      const inst = document.getElementById('instSelect').value;
+      const baseMidi = 48 + rootIndex; // starting in C3-B3 octave
+
+      // Intervals: Major = [0, 4, 7, 12], Minor = [0, 3, 7, 12]
+      const third = isMinor ? 3 : 4;
+      const intervals = [0, third, 7, 12];
+      const noteMidis = intervals.map(semitone => baseMidi + semitone);
+
+      const rootName = NOTE_NAMES[rootIndex];
+      const chordLabel = rootName + (isMinor ? "m" : "");
+      const spelledNotes = intervals.map(i => NOTE_NAMES[(rootIndex + i) % 12]).join(" - ");
+
+      document.getElementById('readoutChord').innerText = chordLabel + (isMinor ? " MINOR" : " MAJOR");
+      document.getElementById('readoutNotes').innerText = spelledNotes;
+
+      const now = ctx.currentTime;
+      const strumDelay = isStrumming ? 0.034 : 0.0;
+
+      noteMidis.forEach((midi, idx) => {
+        const freq = midiToFreq(midi);
+        playNote(freq, inst, now + (idx * strumDelay), 1.7);
+      });
+    }
+
+    // Refresh display labels on all 6 columns and their pads
+    function renderColumns() {
+      for (let c = 0; c < 6; c++) {
+        const rootIndex = currentColumns[c];
+        const name = NOTE_NAMES[rootIndex];
+
+        // Column header label
+        const degElem = document.getElementById(`degLabel${c}`);
+        if (degElem) degElem.innerText = `${name} ▼`;
+
+        // Major button (row 1)
+        const majBtn = document.querySelector(`.pad-btn[data-col="${c}"][data-quality="maj"]`);
+        if (majBtn) {
+          majBtn.querySelector('.chord-title').innerText = name;
+        }
+
+        // Minor button (row 2)
+        const minBtn = document.querySelector(`.pad-btn[data-col="${c}"][data-quality="min"]`);
+        if (minBtn) {
+          minBtn.querySelector('.chord-title').innerText = `${name}m`;
+        }
+      }
+    }
+
+    function setKey(keyName) {
+      if (keyName === 'CUSTOM') return;
+      const rootOffset = KEY_ROOTS[keyName];
+      currentColumns = DEGREE_OFFSETS.map(step => (rootOffset + step) % 12);
+      renderColumns();
+    }
+
+    // Setup pad event listeners
+    document.querySelectorAll('.pad-btn').forEach(btn => {
+      const trigger = (e) => {
+        e.preventDefault();
+        btn.classList.add('active-touch');
+        setTimeout(() => btn.classList.remove('active-touch'), 150);
+
+        const col = parseInt(btn.getAttribute('data-col'), 10);
+        const quality = btn.getAttribute('data-quality');
+        const rootIndex = currentColumns[col];
+        playChord(rootIndex, quality === 'min');
+      };
+
+      btn.addEventListener('touchstart', trigger, { passive: false });
+      btn.addEventListener('mousedown', trigger);
+    });
+
+    // Strum button toggle
+    const strumBtn = document.getElementById('strumToggle');
+    strumBtn.addEventListener('click', () => {
+      isStrumming = !isStrumming;
+      strumBtn.innerText = isStrumming ? 'STRUM' : 'BLOCK';
+      strumBtn.classList.toggle('text-emerald-400', isStrumming);
+      strumBtn.classList.toggle('border-emerald-500', 

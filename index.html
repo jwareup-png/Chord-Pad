@@ -4,13 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Pocket Chord Pad</title>
+
+  <!-- PWA & Mobile Full-Screen Metadata -->
+  <meta name="theme-color" content="#121212">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Pocket%20Chord%20Pad%22%2C%22short_name%22%3A%22ChordPad%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23121212%22%2C%22theme_color%22%3A%22%23121212%22%7D">
+
   <style>
     :root {
       --bg: #121212;
       --card-bg: #1c1c1e;
       --pad-idle: #242426;
-      --pad-major-flash: #2563eb; /* Bright blue flash */
-      --pad-minor-flash: #10b981; /* Bright emerald flash */
+      --pad-major-flash: #2563eb;
+      --pad-minor-flash: #10b981;
       --text: #ffffff;
       --subtext: #9ca3af;
       --border-color: #38383a;
@@ -184,7 +192,6 @@
       return audioCtx;
     }
 
-    // Algorithmic guitar overdrive distortion curve
     function makeDistortionCurve(amount = 45) {
       if (distCurve) return distCurve;
       const k = typeof amount === 'number' ? amount : 50;
@@ -224,7 +231,6 @@
       ];
     }
 
-    // Scale palette: I, III, IV, V, VI, VII degrees
     const scaleRoots = {
       'G':  ['G', 'B', 'C', 'D', 'E', 'F#'],
       'C':  ['C', 'E', 'F', 'G', 'A', 'B'],
@@ -306,7 +312,6 @@
           osc.stop(noteStart + 1.9);
 
         } else {
-          // Warm Synth Pad
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, noteStart);
           gain.gain.setValueAtTime(0.001, noteStart);
@@ -333,7 +338,6 @@
     function buildPads() {
       grid.innerHTML = '';
 
-      // Row 1: 6 Major Chords
       currentRoots.forEach((root) => {
         const pad = document.createElement('div');
         pad.className = 'pad major';
@@ -352,7 +356,6 @@
         grid.appendChild(pad);
       });
 
-      // Row 2: 6 Minor Chords
       currentRoots.forEach((root) => {
         const pad = document.createElement('div');
         pad.className = 'pad minor';

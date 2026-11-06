@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Pocket Chord Pad</title>
 
-  <!-- PWA & Mobile Full-Screen Metadata -->
+  <!-- PWA & Mobile Standalone Metadata -->
   <meta name="theme-color" content="#121212">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -17,8 +17,8 @@
       --bg: #121212;
       --card-bg: #1c1c1e;
       --pad-idle: #242426;
-      --pad-major-flash: #2563eb;
-      --pad-minor-flash: #10b981;
+      --pad-major-flash: #2563eb; /* Electric Blue flash */
+      --pad-minor-flash: #10b981; /* Emerald Green flash */
       --text: #ffffff;
       --subtext: #9ca3af;
       --border-color: #38383a;
@@ -171,7 +171,7 @@
 
   <div id="custom-inputs">
     <label for="custom-roots">Roots (6):</label>
-    <input type="text" id="custom-roots" value="G, B, C, D, E, F#" placeholder="e.g. G, A, B, C, D, E">
+    <input type="text" id="custom-roots" value="G, A, B, C, D, E" placeholder="e.g. G, A, B, C, D, E">
     <button id="btn-apply-custom">Set</button>
   </div>
 
@@ -231,19 +231,20 @@
       ];
     }
 
+    // Scale roots mapping using degrees I, II, III, IV, V, VI
     const scaleRoots = {
-      'G':  ['G', 'B', 'C', 'D', 'E', 'F#'],
-      'C':  ['C', 'E', 'F', 'G', 'A', 'B'],
-      'D':  ['D', 'F#', 'G', 'A', 'B', 'C#'],
-      'A':  ['A', 'C#', 'D', 'E', 'F#', 'G#'],
-      'E':  ['E', 'G#', 'A', 'B', 'C#', 'D#'],
-      'B':  ['B', 'D#', 'E', 'F#', 'G#', 'A#'],
-      'F#': ['F#', 'A#', 'B', 'C#', 'D#', 'E#'],
-      'F':  ['F', 'A', 'Bb', 'C', 'D', 'E'],
-      'Bb': ['Bb', 'D', 'Eb', 'F', 'G', 'A'],
-      'Eb': ['Eb', 'G', 'Ab', 'Bb', 'C', 'D'],
-      'Ab': ['Ab', 'C', 'Db', 'Eb', 'F', 'G'],
-      'Db': ['Db', 'F', 'Gb', 'Ab', 'Bb', 'C']
+      'G':  ['G', 'A', 'B', 'C', 'D', 'E'],
+      'C':  ['C', 'D', 'E', 'F', 'G', 'A'],
+      'D':  ['D', 'E', 'F#', 'G', 'A', 'B'],
+      'A':  ['A', 'B', 'C#', 'D', 'E', 'F#'],
+      'E':  ['E', 'F#', 'G#', 'A', 'B', 'C#'],
+      'B':  ['B', 'C#', 'D#', 'E', 'F#', 'G#'],
+      'F#': ['F#', 'G#', 'A#', 'B', 'C#', 'D#'],
+      'F':  ['F', 'G', 'A', 'Bb', 'C', 'D'],
+      'Bb': ['Bb', 'C', 'D', 'Eb', 'F', 'G'],
+      'Eb': ['Eb', 'F', 'G', 'Ab', 'Bb', 'C'],
+      'Ab': ['Ab', 'Bb', 'C', 'Db', 'Eb', 'F'],
+      'Db': ['Db', 'Eb', 'F', 'Gb', 'Ab', 'Bb']
     };
 
     function playVoicing(freqs, tone) {
@@ -312,6 +313,7 @@
           osc.stop(noteStart + 1.9);
 
         } else {
+          // Warm Synth Pad
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, noteStart);
           gain.gain.setValueAtTime(0.001, noteStart);
@@ -338,6 +340,7 @@
     function buildPads() {
       grid.innerHTML = '';
 
+      // Row 1: 6 Major Chords
       currentRoots.forEach((root) => {
         const pad = document.createElement('div');
         pad.className = 'pad major';
@@ -356,6 +359,7 @@
         grid.appendChild(pad);
       });
 
+      // Row 2: 6 Minor Chords
       currentRoots.forEach((root) => {
         const pad = document.createElement('div');
         pad.className = 'pad minor';
